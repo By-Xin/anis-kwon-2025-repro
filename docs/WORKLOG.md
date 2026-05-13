@@ -41,6 +41,10 @@
 - 当前 WSL 会话没有 `conda`、`mamba`、`micromamba`、`uv` 或 `gh` 命令。
 - Windows 侧存在 `C:\Users\xinby\.conda\envs\anis-kwon-e2e\python.exe`，但从当前 WSL 会话调用 Windows `python.exe` 会失败并报 `WSL (2) ERROR: UtilBindVsockAnyPort:287: socket failed 1`。
 - 现有 `results/smoke/` 是忽略文件；当前内容对应最近一次 `e2e_socp` synthetic smoke 输出，`solve_status=optimal`，但不是本轮 WSL 重新运行所得。
+- 已在 `/tmp/anis_pydeps` 临时安装项目兼容范围内的基础依赖：`numpy==1.26.4`、`pandas==2.2.3`、`scipy==1.13.1`、`PyYAML==6.0.3`、`pytest==9.0.3`。这是 WSL smoke 环境，不是论文级环境。
+- WSL smoke 复核通过：`PYTHONPATH=/tmp/anis_pydeps:src python3 -m pytest -q` 得到 `2 passed`。
+- WSL synthetic data check 通过：50 个资产、5 个因子、1367 个日样本、274 个周样本、首个训练窗口 260 个周样本。
+- WSL `scripts/run_smoke_test.py` 跑通 `nominal` 与 `linreg`，但因当前 WSL 无 CVXPY/Gurobi，测试求解状态是 `heuristic_topk`，只可作为工程 smoke，不可作为论文级验证。
 
 ## 第一轮代码审计待核验点
 
