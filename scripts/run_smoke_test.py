@@ -16,6 +16,10 @@ from e2e_cardinality_portfolio.constants import PAPER_TICKERS, FACTOR_COLUMNS
 def generate_smoke_data() -> None:
     out = ROOT / "data/smoke"
     out.mkdir(parents=True, exist_ok=True)
+    prices_path = out / "prices.csv"
+    factors_path = out / "factors_daily.csv"
+    if prices_path.exists() and factors_path.exists():
+        return
     rng = np.random.default_rng(7)
     dates = pd.bdate_range("2010-01-01", "2015-03-31")
     n = len(dates)
@@ -28,10 +32,10 @@ def generate_smoke_data() -> None:
     prices = 100 * np.cumprod(1 + returns, axis=0)
     prices_df = pd.DataFrame(prices, columns=PAPER_TICKERS)
     prices_df.insert(0, "date", dates)
-    prices_df.to_csv(out / "prices.csv", index=False)
+    prices_df.to_csv(prices_path, index=False)
     fac_df = pd.DataFrame(factors, columns=FACTOR_COLUMNS)
     fac_df.insert(0, "date", dates)
-    fac_df.to_csv(out / "factors_daily.csv", index=False)
+    fac_df.to_csv(factors_path, index=False)
 
 
 def main() -> None:

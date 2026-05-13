@@ -51,7 +51,7 @@ python scripts/check_data.py --config configs/reproduce_2015_2020.yaml
 
 ## 3. 快速 smoke test
 
-这个命令会生成合成数据并跑 `nominal + linreg`，用于确认工程可以启动。它不是论文复现结果。
+这个命令会复用或生成合成数据，并跑 `nominal + linreg`，用于确认工程可以启动。它不是论文复现结果。
 
 ```bash
 python scripts/run_smoke_test.py

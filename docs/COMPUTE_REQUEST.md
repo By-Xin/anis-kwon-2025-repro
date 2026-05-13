@@ -18,6 +18,8 @@ conda activate anis-kwon-e2e
 pip install -e .
 ```
 
+Windows 注意：截至 2026-05-13，在本机 Windows/Python 3.10 环境中，`scs==3.2.1` 没有可用 pip wheel；本机 smoke/E2E 小切片使用 `scs==3.2.2` 跑通。论文严格复现应优先使用能安装 `scs==3.2.1` 的 Linux/Python 3.10 环境，或者在结果报告中明确记录 SCS 版本偏差。
+
 ## 2. 推荐硬件
 
 ### 最小可用配置
