@@ -69,10 +69,12 @@ def maybe_convert_percent_factors(factors: pd.DataFrame, mode: str | bool = "aut
     if mode_l == "false":
         return factors
     # Fama-French daily files usually express returns in percent, e.g. 0.34 means 0.34%.
-    # If median absolute value is above 0.2, it is almost surely percent. If it is below,
-    # leave as decimal. This rule is conservative for daily factors.
-    med_abs = np.nanmedian(np.abs(factors.to_numpy()))
-    if med_abs > 0.2:
+    # Daily decimal factor returns rarely have a 95th percentile above 20% or a median
+    # above 2%, while raw percent values commonly exceed these thresholds.
+    abs_vals = np.abs(factors.to_numpy())
+    med_abs = np.nanmedian(abs_vals)
+    p95_abs = np.nanpercentile(abs_vals, 95)
+    if p95_abs > 0.2 or med_abs > 0.02:
         return factors / 100.0
     return factors
 

@@ -42,13 +42,15 @@
 - Windows 侧存在 `C:\Users\xinby\.conda\envs\anis-kwon-e2e\python.exe`，但从当前 WSL 会话调用 Windows `python.exe` 会失败并报 `WSL (2) ERROR: UtilBindVsockAnyPort:287: socket failed 1`。
 - 现有 `results/smoke/` 是忽略文件；当前内容对应最近一次 `e2e_socp` synthetic smoke 输出，`solve_status=optimal`，但不是本轮 WSL 重新运行所得。
 - 已在 `/tmp/anis_pydeps` 临时安装项目兼容范围内的基础依赖：`numpy==1.26.4`、`pandas==2.2.3`、`scipy==1.13.1`、`PyYAML==6.0.3`、`pytest==9.0.3`。这是 WSL smoke 环境，不是论文级环境。
-- WSL smoke 复核通过：`PYTHONPATH=/tmp/anis_pydeps:src python3 -m pytest -q` 得到 `2 passed`。
+- WSL smoke 复核通过：`PYTHONPATH=/tmp/anis_pydeps:src python3 -m pytest -q` 当前得到 `4 passed`。
 - WSL synthetic data check 通过：50 个资产、5 个因子、1367 个日样本、274 个周样本、首个训练窗口 260 个周样本。
 - WSL `scripts/run_smoke_test.py` 跑通 `nominal` 与 `linreg`，但因当前 WSL 无 CVXPY/Gurobi，测试求解状态是 `heuristic_topk`，只可作为工程 smoke，不可作为论文级验证。
+- 正式配置检查当前阻塞在缺少真实 `data/prices.csv`；真实 `data/factors_daily.csv` 也尚未放入。
+- 加强了 Fama-French 因子百分比自动识别：从单一 median 阈值改为 median/95 分位组合规则，并补充 raw-percent 与 decimal 两个单元测试。
 
 ## 第一轮代码审计待核验点
 
-- `data.factor_returns_are_percent: auto` 当前用全矩阵 median absolute value `>0.2` 判断百分比口径。正式数据到位后必须检查 `max_abs_daily_factor_return`，必要时显式设置 `true/false`，避免 Fama-French 原始百分比数据被误判。
+- `data.factor_returns_are_percent: auto` 已加强，但正式数据到位后仍必须检查 `max_abs_daily_factor_return`，必要时显式设置 `true/false`。
 - `train_start` 配置目前不参与回测窗口生成；真实数据检查时应确认首个 5 年窗口确实覆盖 2010-01-01 至首个再平衡日前。
 - `E2E_M` 的 Big-M 连续松弛在 `k>=1` 时理论上可能很松，`sum(z)<=k` 对 long-only `sum(w)=1` 的层解约束力有限；这与论文把 Big-M relaxation 作为较松层的设定一致，但后续要用真实切片确认不同 `k` 的训练参数和测试组合是否合理。
 - `results/` 被 `.gitignore` 忽略，正式实验输出不会自动进 git。需要另行决定是否只提交 summary/metadata，还是用外部存储保存大结果文件。
