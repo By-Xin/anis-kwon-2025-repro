@@ -54,6 +54,8 @@
 - 修正了 `prices_to_returns`，明确使用 `pct_change(fill_method=None)`，避免 pandas 默认前向填充缺失价格并掩盖数据问题；当前 WSL 单元测试为 `6 passed`。
 - 补充文件 `../2more.xlsx` 包含完整 `COR.N` 和 `ORCL.N`，均为 3021 条，日期 2010-01-04 到 2021-12-31。已用 `COR.N` 覆盖 `data/prices.csv` 的 `ABC` 列，用 `ORCL.N` 覆盖 `ORCL` 列。
 - 正式数据检查已通过：50 个资产、5 个因子、3020 个日收益样本、626 个周收益样本、24 个再平衡日期，首个再平衡日 2015-01-02，首个训练窗口 260 周。
+- 正式 `nominal/linreg, k=10, max_rebalances=1` 在当前 WSL 环境失败于缺少 `cvxpy`/Gurobi；使用临时 heuristic 配置完成非论文级真实数据 smoke。
+- 修复了 `--max-rebalances` 调试切片的持有期错误：截断再平衡列表后仍应使用完整再平衡日历寻找下一季度。修复后小切片为 2015-01-02 到 2015-04-01，61 个持有日；当前 WSL 单元测试为 `7 passed`。
 
 ## 第一轮代码审计待核验点
 

@@ -77,9 +77,10 @@ def run_backtest(
     out_dir = ensure_dir(cfg.output.output_dir)
     model_dir = ensure_dir(out_dir / "models")
 
-    rebalance_dates = make_rebalance_dates(md.daily_asset_returns, cfg.experiment.oos_start, cfg.experiment.oos_end, cfg.experiment.rebalance_frequency)
+    all_rebalance_dates = make_rebalance_dates(md.daily_asset_returns, cfg.experiment.oos_start, cfg.experiment.oos_end, cfg.experiment.rebalance_frequency)
+    rebalance_dates = all_rebalance_dates
     if max_rebalances is not None:
-        rebalance_dates = rebalance_dates[:max_rebalances]
+        rebalance_dates = all_rebalance_dates[:max_rebalances]
     if not rebalance_dates:
         raise ValueError("No rebalance dates generated. Check oos_start/oos_end and data dates.")
 
@@ -94,7 +95,7 @@ def run_backtest(
             method_return_parts = []
             for i, rb_date in enumerate(rebalance_dates):
                 t0 = time.time()
-                next_date = _next_rebalance_or_end(rebalance_dates, i, cfg.experiment.oos_end, md.daily_asset_returns.index)
+                next_date = _next_rebalance_or_end(all_rebalance_dates, i, cfg.experiment.oos_end, md.daily_asset_returns.index)
                 train_assets, train_factors = five_year_window_weekly(md, rb_date, years=cfg.experiment.train_years)
                 hold = holding_period_daily(md, rb_date, next_date)
                 if hold.empty:

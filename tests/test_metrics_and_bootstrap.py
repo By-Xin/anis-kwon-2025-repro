@@ -4,7 +4,10 @@ import numpy as np
 import pandas as pd
 
 from e2e_cardinality_portfolio.bootstrap import circular_block_bootstrap_indices
+from e2e_cardinality_portfolio.backtest import run_backtest
+from e2e_cardinality_portfolio.config import Config
 from e2e_cardinality_portfolio.data import load_market_data, maybe_convert_percent_factors, prices_to_returns
+from e2e_cardinality_portfolio.data import MarketData
 from e2e_cardinality_portfolio.metrics import sharpe_ratio, max_drawdown
 
 
@@ -63,3 +66,38 @@ def test_prices_to_returns_does_not_forward_fill_missing_prices():
     prices = pd.DataFrame({"AAA": [100.0, np.nan, 105.0]})
     returns = prices_to_returns(prices)
     assert returns["AAA"].isna().all()
+
+
+def test_run_backtest_max_rebalances_keeps_next_scheduled_quarter(tmp_path):
+    dates = pd.bdate_range("2010-01-04", "2015-06-30")
+    rng = np.random.default_rng(1)
+    daily_assets = pd.DataFrame(
+        rng.normal(0.0001, 0.01, size=(len(dates), 2)),
+        index=dates,
+        columns=["AAA", "BBB"],
+    )
+    daily_factors = pd.DataFrame(
+        rng.normal(0.0001, 0.008, size=(len(dates), 1)),
+        index=dates,
+        columns=["Mkt-RF"],
+    )
+    md = MarketData(
+        daily_asset_returns=daily_assets,
+        daily_factors=daily_factors,
+        weekly_asset_returns=(1.0 + daily_assets).resample("W-FRI").prod(min_count=1) - 1.0,
+        weekly_factors=(1.0 + daily_factors).resample("W-FRI").prod(min_count=1) - 1.0,
+    )
+    cfg = Config()
+    cfg.data.tickers = ["AAA", "BBB"]
+    cfg.data.factor_cols = ["Mkt-RF"]
+    cfg.experiment.oos_start = "2015-01-01"
+    cfg.experiment.oos_end = "2015-06-30"
+    cfg.experiment.cardinalities = [1]
+    cfg.experiment.methods = ["nominal"]
+    cfg.solver.allow_heuristic_without_gurobi = True
+    cfg.output.output_dir = str(tmp_path / "out")
+
+    artifacts = run_backtest(md, cfg, methods=["nominal"], cardinalities=[1], max_rebalances=1)
+
+    assert artifacts.run_log.loc[0, "rebalance_date"] == pd.Timestamp("2015-01-01")
+    assert artifacts.run_log.loc[0, "next_date"] == pd.Timestamp("2015-04-01")
