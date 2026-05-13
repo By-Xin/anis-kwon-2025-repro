@@ -56,6 +56,10 @@
 - 正式数据检查已通过：50 个资产、5 个因子、3020 个日收益样本、626 个周收益样本、24 个再平衡日期，首个再平衡日 2015-01-02，首个训练窗口 260 周。
 - 正式 `nominal/linreg, k=10, max_rebalances=1` 在当前 WSL 环境失败于缺少 `cvxpy`/Gurobi；使用临时 heuristic 配置完成非论文级真实数据 smoke。
 - 修复了 `--max-rebalances` 调试切片的持有期错误：截断再平衡列表后仍应使用完整再平衡日历寻找下一季度。修复后小切片为 2015-01-02 到 2015-04-01，61 个持有日；当前 WSL 单元测试为 `7 passed`。
+- 使用 `uv` 在 WSL 仓库内创建 `.venv`，Python 3.10.20。当前环境包版本：`cvxpy==1.4.4`、`cvxpylayers==0.1.6`、`torch==2.3.1+cu121`、`gurobipy==13.0.2`、`scs==3.2.2`。注意：`scs==3.2.1` 在当前 pip 索引不可用，正式报告需要记录该版本偏差。
+- WSL Gurobi WLS license 验证通过；小型 MIQP 状态 `optimal`。运行 Gurobi 时需要允许访问 `token.gurobi.com`。
+- WSL 正式 baseline 小切片跑通：`nominal/linreg, k=10, max_rebalances=1`，两个方法测试 MIQP 状态均为 `optimal`，持有期 2015-01-02 到 2015-04-01。
+- WSL E2E 依赖 smoke 跑通：`configs/smoke.yaml --methods e2e_m --cardinalities 5 --max-rebalances 1`，CVXPYLayers/PyTorch/SCS 训练 20 个样本、1 epoch，最终 Gurobi 状态 `optimal`。
 
 ## 第一轮代码审计待核验点
 

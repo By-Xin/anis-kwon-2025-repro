@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 .env
 .venv/
+.uv-python/
+.uv-cache/
 results/
 data/prices.csv
 data/factors_daily.csv
