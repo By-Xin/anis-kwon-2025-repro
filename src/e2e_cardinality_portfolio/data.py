@@ -54,7 +54,7 @@ def prices_to_returns(prices: pd.DataFrame) -> pd.DataFrame:
     if (prices <= 0).any().any():
         bad = prices.columns[(prices <= 0).any()].tolist()
         raise ValueError(f"Prices must be strictly positive. Nonpositive values found in {bad[:10]}")
-    return prices.pct_change().dropna(how="all")
+    return prices.pct_change(fill_method=None).dropna(how="all")
 
 
 def maybe_convert_percent_factors(factors: pd.DataFrame, mode: str | bool = "auto") -> pd.DataFrame:
@@ -126,10 +126,20 @@ def load_market_data(
 
     # Align on trading days, but keep asset/factor names separate.
     daily_asset_returns, daily_factors = _align_and_drop_missing(daily_asset_returns, daily_factors)
+    if daily_asset_returns.empty:
+        raise ValueError(
+            "No aligned non-missing daily observations remain after matching asset returns and factors. "
+            "Check missing price/factor columns and ticker mappings."
+        )
 
     weekly_asset_returns = compound_to_weekly(daily_asset_returns, weekly_rule)
     weekly_factors = compound_to_weekly(daily_factors, weekly_rule)
     weekly_asset_returns, weekly_factors = _align_and_drop_missing(weekly_asset_returns, weekly_factors)
+    if weekly_asset_returns.empty:
+        raise ValueError(
+            "No aligned non-missing weekly observations remain after compounding daily data. "
+            "Check missing price/factor columns and ticker mappings."
+        )
 
     return MarketData(
         daily_asset_returns=daily_asset_returns,

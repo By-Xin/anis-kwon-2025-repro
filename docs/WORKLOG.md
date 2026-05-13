@@ -45,9 +45,13 @@
 - WSL smoke 复核通过：`PYTHONPATH=/tmp/anis_pydeps:src python3 -m pytest -q` 当前得到 `5 passed`。
 - WSL synthetic data check 通过：50 个资产、5 个因子、1367 个日样本、274 个周样本、首个训练窗口 260 个周样本。
 - WSL `scripts/run_smoke_test.py` 跑通 `nominal` 与 `linreg`，但因当前 WSL 无 CVXPY/Gurobi，测试求解状态是 `heuristic_topk`，只可作为工程 smoke，不可作为论文级验证。
-- 正式配置检查当前阻塞在缺少真实 `data/prices.csv`；真实 `data/factors_daily.csv` 也尚未放入。
+- 正式配置此前阻塞在缺少真实 `data/prices.csv` 和 `data/factors_daily.csv`。
 - 加强了 Fama-French 因子百分比自动识别：从单一 median 阈值改为 median/95 分位组合规则，并补充 raw-percent 与 decimal 两个单元测试。
 - 修正了资产收益与因子收益的缺失值对齐逻辑：日度和周度数据都会先取共同日期，再按两侧任一缺失行一起删除，避免周聚合时资产/因子使用不同日集合。
+- Kenneth French 五因子已生成到 `data/factors_daily.csv`，3021 条数据，日期 2010-01-04 到 2021-12-31，原始百分比口径。
+- Choice 导出的价格文件实际在 `../snp500_50top.xlsx`，已清洗到 `data/prices.csv`，3021 行、51 列，日期 2010-01-04 到 2021-12-31；但源数据有两个关键缺口：`ABC` 只来自可疑代码 `ABC.LD`，缺 2259 天；`ORCL.O` 只到 2017-11-20，缺 1040 天。
+- 因 `ABC` 与 `ORCL` 的缺失区间没有完整重叠，正式 `check_data` 当前失败：没有任何 50 个资产与 5 个因子同时非缺失的日度观测。
+- 修正了 `prices_to_returns`，明确使用 `pct_change(fill_method=None)`，避免 pandas 默认前向填充缺失价格并掩盖数据问题；当前 WSL 单元测试为 `6 passed`。
 
 ## 第一轮代码审计待核验点
 

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from e2e_cardinality_portfolio.bootstrap import circular_block_bootstrap_indices
-from e2e_cardinality_portfolio.data import load_market_data, maybe_convert_percent_factors
+from e2e_cardinality_portfolio.data import load_market_data, maybe_convert_percent_factors, prices_to_returns
 from e2e_cardinality_portfolio.metrics import sharpe_ratio, max_drawdown
 
 
@@ -57,3 +57,9 @@ def test_load_market_data_drops_missing_factor_days_from_assets_too(tmp_path):
     missing_factor_day = pd.Timestamp("2020-01-03")
     assert missing_factor_day not in md.daily_asset_returns.index
     assert md.daily_asset_returns.index.equals(md.daily_factors.index)
+
+
+def test_prices_to_returns_does_not_forward_fill_missing_prices():
+    prices = pd.DataFrame({"AAA": [100.0, np.nan, 105.0]})
+    returns = prices_to_returns(prices)
+    assert returns["AAA"].isna().all()
