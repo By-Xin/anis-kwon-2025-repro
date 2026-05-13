@@ -86,6 +86,14 @@ def compound_to_weekly(returns: pd.DataFrame, rule: str = "W-FRI") -> pd.DataFra
     return weekly
 
 
+def _align_and_drop_missing(left: pd.DataFrame, right: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    idx = left.index.intersection(right.index)
+    left = left.loc[idx]
+    right = right.loc[idx]
+    valid = left.notna().all(axis=1) & right.notna().all(axis=1)
+    return left.loc[valid], right.loc[valid]
+
+
 def load_market_data(
     prices_csv: str | Path,
     factors_csv: str | Path,
@@ -117,15 +125,11 @@ def load_market_data(
     daily_factors = maybe_convert_percent_factors(factors[factor_cols], factor_returns_are_percent)
 
     # Align on trading days, but keep asset/factor names separate.
-    idx = daily_asset_returns.index.intersection(daily_factors.index)
-    daily_asset_returns = daily_asset_returns.loc[idx].dropna(how="any")
-    daily_factors = daily_factors.loc[daily_asset_returns.index].dropna(how="any")
+    daily_asset_returns, daily_factors = _align_and_drop_missing(daily_asset_returns, daily_factors)
 
     weekly_asset_returns = compound_to_weekly(daily_asset_returns, weekly_rule)
     weekly_factors = compound_to_weekly(daily_factors, weekly_rule)
-    widx = weekly_asset_returns.index.intersection(weekly_factors.index)
-    weekly_asset_returns = weekly_asset_returns.loc[widx].dropna(how="any")
-    weekly_factors = weekly_factors.loc[weekly_asset_returns.index].dropna(how="any")
+    weekly_asset_returns, weekly_factors = _align_and_drop_missing(weekly_asset_returns, weekly_factors)
 
     return MarketData(
         daily_asset_returns=daily_asset_returns,
