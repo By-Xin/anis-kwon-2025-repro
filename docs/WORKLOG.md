@@ -33,3 +33,18 @@
 - 用真实数据先跑 `nominal`/`linreg` 的 `k=10`、`max_rebalances=1` 小切片。
 - 再跑真实数据 `e2e_m` 小切片，确认训练时间、solver warning 和 Gurobi 状态。
 - 正式跑全量前，需要决定是否接受 Windows 上 `scs==3.2.2` 的偏差，或另建 Linux/Python 3.10 环境以追求 `scs==3.2.1`。
+
+## 当前 WSL 会话复核
+
+- GitHub remote 已确认可访问：`git@github.com:By-Xin/anis-kwon-2025-repro.git`，本地 `main` 与 `origin/main` 同步且工作树干净。
+- 当前 WSL 系统只有 `/usr/bin/python3`，版本为 Python 3.12.3；缺少 `numpy`、`pytest`、CVXPYLayers 等依赖，也不满足项目声明的 `>=3.10,<3.12`。
+- 当前 WSL 会话没有 `conda`、`mamba`、`micromamba`、`uv` 或 `gh` 命令。
+- Windows 侧存在 `C:\Users\xinby\.conda\envs\anis-kwon-e2e\python.exe`，但从当前 WSL 会话调用 Windows `python.exe` 会失败并报 `WSL (2) ERROR: UtilBindVsockAnyPort:287: socket failed 1`。
+- 现有 `results/smoke/` 是忽略文件；当前内容对应最近一次 `e2e_socp` synthetic smoke 输出，`solve_status=optimal`，但不是本轮 WSL 重新运行所得。
+
+## 第一轮代码审计待核验点
+
+- `data.factor_returns_are_percent: auto` 当前用全矩阵 median absolute value `>0.2` 判断百分比口径。正式数据到位后必须检查 `max_abs_daily_factor_return`，必要时显式设置 `true/false`，避免 Fama-French 原始百分比数据被误判。
+- `train_start` 配置目前不参与回测窗口生成；真实数据检查时应确认首个 5 年窗口确实覆盖 2010-01-01 至首个再平衡日前。
+- `E2E_M` 的 Big-M 连续松弛在 `k>=1` 时理论上可能很松，`sum(z)<=k` 对 long-only `sum(w)=1` 的层解约束力有限；这与论文把 Big-M relaxation 作为较松层的设定一致，但后续要用真实切片确认不同 `k` 的训练参数和测试组合是否合理。
+- `results/` 被 `.gitignore` 忽略，正式实验输出不会自动进 git。需要另行决定是否只提交 summary/metadata，还是用外部存储保存大结果文件。
