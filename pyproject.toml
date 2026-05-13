@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "e2e-cardinality-portfolio-repro"
+version = "0.1.0"
+description = "Reproduction bundle for Anis & Kwon (2025) end-to-end decision-based cardinality-constrained portfolio optimization."
+requires-python = ">=3.10,<3.12"
+authors = [{name = "Reproduction bundle"}]
+readme = "README.md"
+dependencies = [
+  "numpy>=1.24,<2.0",
+  "pandas>=2.0,<2.3",
+  "PyYAML>=6.0",
+  "scipy>=1.10,<1.14",
+  "cvxpy>=1.3,<1.5",
+  "cvxpylayers>=0.1.6,<0.2",
+  "torch>=2.0,<2.4",
+  "scs==3.2.1",
+  "gurobipy>=9.5",
+  "tqdm>=4.65",
+  "pandas-datareader>=0.10",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

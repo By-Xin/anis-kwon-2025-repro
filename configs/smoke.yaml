@@ -1,0 +1,30 @@
+data:
+  prices_csv: data/smoke/prices.csv
+  factors_csv: data/smoke/factors_daily.csv
+  date_col: date
+  factor_returns_are_percent: false
+  input_returns_are_prices: true
+  weekly_rule: W-FRI
+experiment:
+  train_start: '2010-01-01'
+  oos_start: '2015-01-01'
+  oos_end: '2015-03-31'
+  train_years: 5
+  rebalance_frequency: QS
+  cardinalities: [5]
+  methods: [nominal, linreg]
+  initial_wealth: 1000000.0
+bootstrap:
+  n_samples: 20
+  block_size: 5
+  seed: 42
+train:
+  epochs: 1
+  batch_size: 5
+  lr: 0.01
+  final_epoch_lr: 0.001
+solver:
+  test_solver: GUROBI
+  allow_heuristic_without_gurobi: true
+output:
+  output_dir: results/smoke

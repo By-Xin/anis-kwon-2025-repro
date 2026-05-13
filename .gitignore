@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+results/
+data/prices.csv
+data/factors_daily.csv
+logs/

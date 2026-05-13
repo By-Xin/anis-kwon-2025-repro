@@ -1,0 +1,38 @@
+# The data section of the paper states the rolling out-of-sample span is 2015--2021,
+# while Tables 3--4 are captioned 2015--2020 and Table 2 reports 24 quarterly periods.
+# Use this alternate config only for the broader text-level OOS span.
+data:
+  prices_csv: data/prices.csv
+  factors_csv: data/factors_daily.csv
+  date_col: date
+  factor_returns_are_percent: auto
+  input_returns_are_prices: true
+  weekly_rule: W-FRI
+experiment:
+  train_start: '2010-01-01'
+  oos_start: '2015-01-01'
+  oos_end: '2021-12-31'
+  train_years: 5
+  rebalance_frequency: QS
+  cardinalities: [10, 15, 20]
+  methods: [nominal, linreg, e2e_m, e2e_socp, e2e_sdp]
+  initial_wealth: 1000000.0
+bootstrap:
+  n_samples: 2000
+  block_size: 20
+  seed: 123
+train:
+  epochs: 4
+  batch_size: 20
+  lr: 0.01
+  final_epoch_lr: 0.001
+  dtype: double
+  solver: SCS
+  solver_eps: 1.0e-4
+  solver_max_iters: 5000
+solver:
+  test_solver: GUROBI
+  allow_heuristic_without_gurobi: false
+  mip_mip_gap: 1.0e-8
+output:
+  output_dir: results/reproduce_2015_2021
