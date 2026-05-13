@@ -60,6 +60,8 @@
 - WSL Gurobi WLS license 验证通过；小型 MIQP 状态 `optimal`。运行 Gurobi 时需要允许访问 `token.gurobi.com`。
 - WSL 正式 baseline 小切片跑通：`nominal/linreg, k=10, max_rebalances=1`，两个方法测试 MIQP 状态均为 `optimal`，持有期 2015-01-02 到 2015-04-01。
 - WSL E2E 依赖 smoke 跑通：`configs/smoke.yaml --methods e2e_m --cardinalities 5 --max-rebalances 1`，CVXPYLayers/PyTorch/SCS 训练 20 个样本、1 epoch，最终 Gurobi 状态 `optimal`。
+- Overnight主体实验已完成，除 SDP 外：`nominal`、`linreg`、`e2e_m`、`e2e_socp` 均完成 `k=10,15,20`、24 个季度的 2015--2020 口径。所有测试 MIQP 状态均为 `optimal`；所有 E2E training log 的 CVXPYLayer solve failure 总数均为 0。
+- 结果摘要已写入 `docs/RESULTS_SUMMARY_2015_2020.md`。本地完整 artifacts 位于 `results/reproduce_2015_2020_*`，仍被 git ignore。
 
 ## 第一轮代码审计待核验点
 
