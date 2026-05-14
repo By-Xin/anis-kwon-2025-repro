@@ -38,6 +38,7 @@ def main() -> None:
     windows = rebalance_schedule(md, cfg, args.max_windows)
     ks = args.cardinalities or list(cfg["experiment"]["cardinalities"])
     rows = []
+    result_path = out / "train_eval_sweep.csv"
 
     for widx, (reb, nxt) in enumerate(tqdm(windows, desc="windows")):
         f_train, r_train = training_window(md, reb, cfg)
@@ -58,9 +59,10 @@ def main() -> None:
                         except Exception as exc:
                             rows.append({"window": widx, "rebalance": reb.date(), "cardinality": int(k), "method": method.lower(), "n_samples": int(n_samples), "epochs": int(epochs), "error": repr(exc)})
                             print(f"[WARN] train failed method={method} J={n_samples} epochs={epochs} window={widx} k={k}: {exc}")
+                        pd.DataFrame(rows).to_csv(result_path, index=False)
     df = pd.DataFrame(rows)
-    df.to_csv(out / "train_eval_sweep.csv", index=False)
-    print(f"Wrote {out/'train_eval_sweep.csv'}")
+    df.to_csv(result_path, index=False)
+    print(f"Wrote {result_path}")
 
 
 if __name__ == "__main__":

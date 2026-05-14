@@ -29,6 +29,23 @@ def _cvxpy_import():
     return cp
 
 
+def _solver_kwargs(cfg: dict) -> dict:
+    solver = str(cfg.get("cvx_solver", "SCS")).upper()
+    eps = float(cfg.get("cvx_eps", 1e-4))
+    max_iters = int(cfg.get("cvx_max_iters", 5000))
+    kwargs = {"verbose": bool(cfg.get("cvx_verbose", False))}
+    if solver == "SCS":
+        kwargs.update({"eps": eps, "max_iters": max_iters})
+    elif solver == "CLARABEL":
+        kwargs.update({
+            "tol_gap_abs": eps,
+            "tol_gap_rel": eps,
+            "tol_feas": eps,
+            "max_iter": max_iters,
+        })
+    return kwargs
+
+
 def solve_bigm_relaxation(fit: FactorFit, k: int, cfg: dict) -> RelaxationResult:
     """Big-M continuous relaxation.
 
@@ -80,9 +97,7 @@ def solve_socp_relaxation(fit: FactorFit, k: int, cfg: dict) -> RelaxationResult
     obj = cp.Minimize(cp.quad_form(v, nearest_psd(Sf, float(cfg.get("psd_jitter", 1e-8)))) + (psi**2) @ delta)
     prob = cp.Problem(obj, constraints)
     solver = cfg.get("cvx_solver", "SCS")
-    kwargs = {"verbose": bool(cfg.get("cvx_verbose", False))}
-    if str(solver).upper() == "SCS":
-        kwargs.update({"eps": float(cfg.get("cvx_eps", 1e-4)), "max_iters": int(cfg.get("cvx_max_iters", 5000))})
+    kwargs = _solver_kwargs(cfg)
     prob.solve(solver=solver, **kwargs)
     ww = np.asarray(w.value, dtype=float).reshape(-1) if w.value is not None else np.full(n, np.nan)
     zz = np.asarray(z.value, dtype=float).reshape(-1) if z.value is not None else None
@@ -118,9 +133,7 @@ def solve_sdp_relaxation(fit: FactorFit, k: int, cfg: dict) -> RelaxationResult:
     ]
     prob = cp.Problem(cp.Minimize(cp.trace(Sigma @ W)), constraints)
     solver = cfg.get("cvx_solver", "SCS")
-    kwargs = {"verbose": bool(cfg.get("cvx_verbose", False))}
-    if str(solver).upper() == "SCS":
-        kwargs.update({"eps": float(cfg.get("cvx_eps", 1e-4)), "max_iters": int(cfg.get("cvx_max_iters", 5000))})
+    kwargs = _solver_kwargs(cfg)
     prob.solve(solver=solver, **kwargs)
     ww = np.asarray(w.value, dtype=float).reshape(-1) if w.value is not None else np.full(n, np.nan)
     Wv = np.asarray(W.value, dtype=float) if W.value is not None else None

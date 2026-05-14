@@ -66,6 +66,7 @@
 - 补充实验 synthetic smoke 已通过：`exact/bigm/socp/sdp` 的 N=12 relaxation quality 可运行，聚合脚本可生成 summary/fig；Big-M 梯度对齐最小 smoke 可运行且 `bad_layer_solves=0`。
 - 补充实验已用真实 50 资产数据完成最小对接检查：`paper50`, `exact+bigm`, `k=10`, `max_windows=1`，Gurobi 状态 `2`/optimal，Big-M gap 约 `3e-6`，top-k overlap 为 `1.0`。
 - 针对 SCS tolerance，补充诊断输出新增 `bound_violation` 和 `relax_portfolio_gap_to_exact`，避免把低精度 cone solve 的 bound 反号误读成 relaxation 本身问题；smoke 配置已调到 `cvx_eps=1e-6`、`cvx_max_iters=20000`。
+- 补充诊断 full run 已完成并汇总到 `docs/SDP_DIAGNOSTICS_RESULTS_2026-05-14.md`：relaxation quality、CLARABEL SDP 复核、gradient alignment、Big-M/SOCP train sweep、SDP train micro、STE integer-forward 均已跑出结果。N=50 SDP train full grid 尝试到 `J=128, epoch=1` 超过 20 分钟未完成，已改为记录 micro run 与成本瓶颈。
 
 ## 第一轮代码审计待核验点
 

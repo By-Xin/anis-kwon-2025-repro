@@ -37,6 +37,7 @@ def main() -> None:
     windows = rebalance_schedule(md, cfg, args.max_windows)
     ks = args.cardinalities or list(cfg["experiment"]["cardinalities"])
     rows = []
+    result_path = out / "ste_integer_forward.csv"
     for widx, (reb, nxt) in enumerate(tqdm(windows, desc="windows")):
         f_train, r_train = training_window(md, reb, cfg)
         val = validation_segment(md, reb, nxt)
@@ -50,9 +51,10 @@ def main() -> None:
                 except Exception as exc:
                     rows.append({"window": widx, "rebalance": reb.date(), "cardinality": int(k), "method": method.lower(), "error": repr(exc)})
                     print(f"[WARN] STE failed method={method} window={widx} k={k}: {exc}")
+                pd.DataFrame(rows).to_csv(result_path, index=False)
     df = pd.DataFrame(rows)
-    df.to_csv(out / "ste_integer_forward.csv", index=False)
-    print(f"Wrote {out/'ste_integer_forward.csv'}")
+    df.to_csv(result_path, index=False)
+    print(f"Wrote {result_path}")
 
 
 if __name__ == "__main__":
