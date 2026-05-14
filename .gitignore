@@ -7,4 +7,5 @@ __pycache__/
 results/
 data/prices.csv
 data/factors_daily.csv
+data/sdp_diagnostics/
 logs/

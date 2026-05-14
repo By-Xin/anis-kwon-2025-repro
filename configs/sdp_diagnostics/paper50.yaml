@@ -1,0 +1,100 @@
+project:
+  seed: 12345
+  output_dir: results/sdp_diagnostics/paper50
+
+data:
+  prices_csv: data/prices.csv
+  factors_csv: data/factors_daily.csv
+  date_col: date
+  factor_scale: auto
+  weekly_rule: W-FRI
+  fill_missing_prices: true
+  max_consecutive_missing_prices: 5
+  min_weekly_obs: 240
+  tickers:
+    - CVX
+    - HES
+    - OXY
+    - SO
+    - BALL
+    - ECL
+    - VMC
+    - FDX
+    - LMT
+    - MMM
+    - RHI
+    - UPS
+    - AMZN
+    - AZO
+    - BBWI
+    - F
+    - HAS
+    - YUM
+    - CPB
+    - EL
+    - MKC
+    - PEP
+    - PM
+    - A
+    - ABC
+    - BIIB
+    - CVS
+    - DGX
+    - JNJ
+    - SYK
+    - AIG
+    - BAC
+    - PGR
+    - SCHW
+    - WFC
+    - AAPL
+    - AKAM
+    - CRM
+    - CTSH
+    - MA
+    - ORCL
+    - DIS
+    - EA
+    - T
+    - AES
+    - CMS
+    - DUK
+    - EQR
+    - PLD
+    - SPG
+  factor_cols: [Mkt-RF, SMB, HML, RMW, CMA]
+
+experiment:
+  oos_start: '2015-01-01'
+  oos_end: '2020-12-31'
+  train_years: 5
+  rebalance_months: 3
+  cardinalities: [10, 15, 20]
+  validation_months: 3
+
+bootstrap:
+  n_samples: 2000
+  block_size: 20
+  target_length: null
+
+solver:
+  exact_solver: auto       # auto | gurobi | enumeration | rounding
+  max_enumeration: 200000
+  gurobi_time_limit: 600
+  gurobi_mip_gap: 1.0e-8
+  fallback_rounding: true
+  cvx_solver: SCS
+  cvx_eps: 1.0e-4
+  cvx_max_iters: 5000
+  cvx_verbose: false
+  psd_jitter: 1.0e-8
+
+training:
+  learning_rate: 0.01
+  final_learning_rate: 0.001
+  batch_size: 16
+  epochs: 4
+  torch_dtype: float64
+  gradient_clip_norm: 10.0
+  loss_return_periods: 52
+  loss_vol_periods: 52

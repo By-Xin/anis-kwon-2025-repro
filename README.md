@@ -14,6 +14,7 @@ anis_kwon_2025_repro/
   scripts/                  # 一键检查/运行脚本
   src/e2e_cardinality_portfolio/
                             # 核心 Python 包
+  src/sdp_relax_diag/       # SDP/SOCP/Big-M 补充诊断实验包
   results/                  # 运行输出
 ```
 
@@ -136,3 +137,32 @@ solver:
 ### batch size 为什么是 20？
 
 论文 Algorithm 2 列出 batch size，但没有给出数值。bundle 默认 20，是工程上稳定的默认值；请在敏感性实验中记录它。
+
+## 8. SDP/SOCP/Big-M 补充诊断实验
+
+这个仓库还包含一组补充实验，用来检查“更紧的 SDP/SOCP relaxation 是否真的给
+E2E 训练带来更好的 decision surrogate”。它不是主复现实验的替代，而是并列诊断模块。
+
+入口文档：
+
+```text
+docs/SDP_DIAGNOSTICS_INTEGRATION.md
+docs/sdp_relaxation_diagnostics/README_CN.md
+```
+
+最小 smoke test：
+
+```bash
+python scripts/sdp_diagnostics/make_synthetic_data.py
+python scripts/sdp_diagnostics/validate_data.py --config configs/sdp_diagnostics/smoke.yaml
+python scripts/sdp_diagnostics/run_relaxation_quality.py \
+  --config configs/sdp_diagnostics/smoke.yaml \
+  --methods exact bigm \
+  --max-windows 1
+```
+
+论文 50 资产口径的核心诊断配置是：
+
+```text
+configs/sdp_diagnostics/paper50.yaml
+```

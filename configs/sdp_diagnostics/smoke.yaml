@@ -1,0 +1,50 @@
+project:
+  seed: 7
+  output_dir: results/sdp_diagnostics/smoke
+
+data:
+  prices_csv: data/sdp_diagnostics/smoke/prices.csv
+  factors_csv: data/sdp_diagnostics/smoke/factors_daily.csv
+  date_col: date
+  factor_scale: auto
+  weekly_rule: W-FRI
+  fill_missing_prices: true
+  max_consecutive_missing_prices: 5
+  min_weekly_obs: 200
+  tickers: [A00,A01,A02,A03,A04,A05,A06,A07,A08,A09,A10,A11]
+  factor_cols: [Mkt-RF, SMB, HML, RMW, CMA]
+
+experiment:
+  oos_start: '2015-01-01'
+  oos_end: '2015-06-30'
+  train_years: 5
+  rebalance_months: 3
+  cardinalities: [3]
+  validation_months: 3
+
+bootstrap:
+  n_samples: 16
+  block_size: 5
+  target_length: null
+
+solver:
+  exact_solver: enumeration
+  max_enumeration: 50000
+  gurobi_time_limit: 60
+  gurobi_mip_gap: 1.0e-8
+  fallback_rounding: true
+  cvx_solver: SCS
+  cvx_eps: 1.0e-6
+  cvx_max_iters: 20000
+  cvx_verbose: false
+  psd_jitter: 1.0e-8
+
+training:
+  learning_rate: 0.01
+  final_learning_rate: 0.001
+  batch_size: 4
+  epochs: 1
+  torch_dtype: float64
+  gradient_clip_norm: 10.0
+  loss_return_periods: 52
+  loss_vol_periods: 52
